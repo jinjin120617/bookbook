@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>작가 정보 허브 — 단톡방 모음</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F2EC;
+    --surface: #FDFBF7;
+    --surface2: #EDE9E0;
+    --ink: #1A1713;
+    --ink2: #5A5650;
+    --ink3: #9A958E;
+    --accent: #C8510A;
+    --accent-light: #F5E6DC;
+    --border: rgba(26,23,19,0.1);
+    --border2: rgba(26,23,19,0.06);
+
+    --cat-인쇄제본: #1B4F8A;
+    --cat-인쇄제본-bg: #E8F0FA;
+    --cat-유통판매: #1A6B3A;
+    --cat-유통판매-bg: #E4F3EA;
+    --cat-북페어행사: #7A3A00;
+    --cat-북페어행사-bg: #FAF0E4;
+    --cat-펀딩: #5C2D8C;
+    --cat-펀딩-bg: #F0E9FA;
+    --cat-출판등록: #0A5C5C;
+    --cat-출판등록-bg: #E4F5F5;
+    --cat-디자인굿즈: #8C1D4A;
+    --cat-디자인굿즈-bg: #FAE8EF;
+    --cat-지원사업: #6B3A00;
+    --cat-지원사업-bg: #FAF0E4;
+    --cat-커뮤니티: #3D3830;
+    --cat-커뮤니티-bg: #F0EDE8;
+    --cat-기술AI: #8C1A1A;
+    --cat-기술AI-bg: #FAE8E8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  .site-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .site-title .dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .site-sub {
+    font-size: 12px;
+    color: var(--ink3);
+    margin-top: 2px;
+    margin-bottom: 1.25rem;
+  }
+
+  /* SEARCH */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink3);
+    pointer-events: none;
+  }
+  #searchInput {
+    width: 100%;
+    padding: 11px 14px 11px 42px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    font-family: 'Noto Sans KR', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  #searchInput:focus { border-color: var(--accent); }
+  #searchInput::placeholder { color: var(--ink3); }
+
+  /* TABS */
+  .tabs-wrap {
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 0;
+  }
+  .tabs-wrap::-webkit-scrollbar { display: none; }
+  .tabs {
+    display: flex;
+    gap: 2px;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border2);
+  }
+  .tab {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--ink3);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    margin-bottom: -1px;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 500;
+  }
+  .tab .n {
+    font-size: 11px;
+    color: var(--ink3);
+    margin-left: 3px;
+  }
+  .tab.active .n { color: var(--accent); opacity: 0.7; }
+
+  /* MAIN */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 4rem;
+  }
+
+  .results-meta {
+    font-size: 12px;
+    color: var(--ink3);
+    margin-bottom: 1rem;
+  }
+
+  /* CARDS */
+  .cards {
+    display: grid;
+    gap: 10px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .card:hover {
+    border-color: var(--border);
+    box-shadow: 0 2px 12px rgba(26,23,19,0.07);
+  }
+  .card.expanded {
+    border-color: var(--border);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    justify-content: space-between;
+  }
+  .card-left { display: flex; align-items: flex-start; gap: 10px; flex: 1; min-width: 0; }
+
+  .cat-badge {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.45;
+  }
+
+  .chevron {
+    flex-shrink: 0;
+    color: var(--ink3);
+    transition: transform 0.2s;
+    margin-top: 2px;
+  }
+  .card.expanded .chevron { transform: rotate(180deg); }
+
+  .card-body {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border2);
+  }
+  .card.expanded .card-body { display: block; }
+
+  .card-text {
+    font-size: 13.5px;
+    color: var(--ink2);
+    line-height: 1.75;
+    white-space: pre-line;
+  }
+  .card-meta {
+    font-size: 11.5px;
+    color: var(--ink3);
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* highlight */
+  mark {
+    background: #FFE58A;
+    color: var(--ink);
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 4rem 0;
+    color: var(--ink3);
+    font-size: 14px;
+  }
+  .no-results span {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Cat colors */
+  .badge-인쇄제본 { background: var(--cat-인쇄제본-bg); color: var(--cat-인쇄제본); }
+  .badge-유통판매 { background: var(--cat-유통판매-bg); color: var(--cat-유통판매); }
+  .badge-북페어행사 { background: var(--cat-북페어행사-bg); color: var(--cat-북페어행사); }
+  .badge-펀딩 { background: var(--cat-펀딩-bg); color: var(--cat-펀딩); }
+  .badge-출판등록 { background: var(--cat-출판등록-bg); color: var(--cat-출판등록); }
+  .badge-디자인굿즈 { background: var(--cat-디자인굿즈-bg); color: var(--cat-디자인굿즈); }
+  .badge-지원사업 { background: var(--cat-지원사업-bg); color: var(--cat-지원사업); }
+  .badge-커뮤니티 { background: var(--cat-커뮤니티-bg); color: var(--cat-커뮤니티); }
+  .badge-기술AI { background: var(--cat-기술AI-bg); color: var(--cat-기술AI); }
+
+  @media (max-width: 600px) {
+    .site-title { font-size: 1.2rem; }
+    .card { padding: 13px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="site-title"><span class="dot"></span>작가 정보 허브</div>
+    <div class="site-sub">단톡방에서 모은 독립출판 실전 정보 · 2025–2026</div>
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="키워드 검색 — 리소, ISBN, 텀블벅, 배본사..." />
+    </div>
+    <div class="tabs-wrap">
+      <div class="tabs" id="tabs"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="results-meta" id="meta"></div>
+  <div class="cards" id="cards"></div>
+</main>
+
+<script>
+const DATA = [
+  {
+    cat: "인쇄제본",
+    title: "디지털 소량 인쇄 — 프린피아몰",
+    body: "100부 내외 소량 인쇄 시 추천. 무선제본은 EVA 접착력 약함 → PUR 또는 중철 권장.\n표지 아르떼·내지 랑데뷰가 빛반사 적음. 컬러가 쨍하게 나오는 경향.\n상담 없이 온라인 주문 가능하나, 낱장 테스트 인쇄 후 진행 권장.\n42p 기준 표지 230g·내지 105g으로 했을 때 꽤 잘 벌어지고 떨어지지 않음.",
+    meta: "출처: 재옥, emily, Monghwa"
+  },
+  {
+    cat: "인쇄제본",
+    title: "그림책 양장 인쇄 완전 가이드",
+    body: "디지털에서도 양장 가능. 표지 130g, 내지 180~240g(어린이일수록 두껍게).\n세네카 기본 6~7mm. 페이지 많으면 1cm 이상.\n옵셋 진행 전 반드시 디지털로 더미북 1권 먼저 제작.\n인쇄 전 낱장 테스트 → 더미북 → 감수 순서 필수.",
+    meta: "출처: Monghwa"
+  },
+  {
+    cat: "인쇄제본",
+    title: "디지털 인쇄 색상 노란 톤 현상",
+    body: "디지털 인쇄도 기계 컨디션·프로파일 불일치로 노란 톤이 덮일 수 있음.\n업체마다 색감·명도 다름. 이전 작업 결과물과 비교해 재인쇄 협상 가능.\n감리 시 기장님에게 직접 원하는 색감 요청 효과적.\n인디고 기계도 기기마다 색감 차이 있음.",
+    meta: "출처: 강성우, 고라해_써니, 신기원"
+  },
+  {
+    cat: "인쇄제본",
+    title: "리소 인쇄 업체 목록",
+    body: "① 코우너스 — corners.kr\n② 판화스토어\n③ 레드프린팅 — 리소는 품질 이슈 후기 있음, 굿즈는 괜찮음\n④ 삼원페이퍼 페이퍼랩 — 군자역, 장당 약 6,000원~, A3 가능, 예약 필수(11시·3시), 마스터 제판가 인상됨\n⑤ 포푸리 — popurri.kr, 낱장 상담 가능, 보유 종이만 사용 가능",
+    meta: "출처: 헐내깡아지, 박민아, 은쥬쥬"
+  },
+  {
+    cat: "인쇄제본",
+    title: "검은 종이에 화이트 인쇄 업체",
+    body: "① 인터프로프린트 인디고 — interproprint.com, 백색 인쇄 가능\n② 비쥬얼봄 — 아트 인쇄 전문 (현재 지도 미노출, 확인 필요)\n화이트 토너 디지털 인쇄 방식.",
+    meta: "출처: 헐내깡아지, 루루쌤"
+  },
+  {
+    cat: "인쇄제본",
+    title: "실제본·사철제본 업체",
+    body: "① 현대제본 — 을지로 방문 필수, 그림 묻어남 없음, 사장님 자신감 있음, 전화 후 방문 권장\n② 이든프린팅 — 소량 견적 가능, 비용 있음\n③ 덕화제책사 — 사이트에서 바로 확인 가능\n\n⚠ 원고는 재단하지 말고 들고 갈 것.",
+    meta: "출처: 박지나, 진수, Cheong"
+  },
+  {
+    cat: "인쇄제본",
+    title: "만화·코믹스 추천 종이 — 스노우지",
+    body: "미국 코믹스 스타일에는 스노우지(코팅·비코팅 중간 느낌). 100g이 일반적.\n내지 흑백이면 토너 인쇄, 컬러는 인디고 권장.\n뉴플러스와 달리 스노우는 가운데 뜨는 현상 없음.",
+    meta: "출처: 박소연, 헐내깡아지"
+  },
+  {
+    cat: "인쇄제본",
+    title: "별색(형광) 인쇄 방법",
+    body: "별색은 옵셋 인쇄소에서 진행. 팬톤 기준이면 수월.\n별색 잉크는 해당 작업 전용으로 만들어 추가 비용 발생.\n감리 시 기장님에게 직접 '형광 최대로 올려달라'고 요청.\nUV 방식도 가능(용지에 따라). 인쇄소 직접 방문 상담이 가장 확실.",
+    meta: "출처: 강성우, 리원, 안누리"
+  },
+  {
+    cat: "인쇄제본",
+    title: "비규격 소형 책자 인쇄 — 태산",
+    body: "태산(t-print.co.kr) — 비규격 소형 사이즈 가능.\n중철 가로 좌철로 90×145mm 등 소형 사이즈 설정 가능.\n내지 흑백이면 토너 인쇄, 미리 선방지 요청 가능, 납기 빠른 편.",
+    meta: "출처: 숩다"
+  },
+  {
+    cat: "인쇄제본",
+    title: "친환경 인쇄 — 금강인쇄",
+    body: "무알콜 + 콩기름 인쇄 가능. 100% 재생지 사용 가능.\n가격은 일반 옵셋과 거의 동일.\n교과서 인쇄 등 대규모 업체라 다소 혼잡할 수 있음.\n'가장 친환경은 적게 찍는 것' — 헐내깡아지",
+    meta: "출처: 헐내깡아지"
+  },
+  {
+    cat: "인쇄제본",
+    title: "두성 인더페이퍼 — 샘플 테스트 인쇄",
+    body: "두성 인더페이퍼 인쇄 서비스 재오픈(2026년 3월).\n샘플 테스트 인쇄 용도로 활용 권장.\n인스타그램 공지 확인.",
+    meta: "출처: 박민아"
+  },
+  {
+    cat: "유통판매",
+    title: "배본사·물류 업체 비교",
+    body: "① 런닝북 — ERP 프로그램료 별도, 소규모 독립출판에 편리한 통합 시스템, 월 5만원 내외\n② 더북(창고) + 날개(배본) — 창고·배본 분리 구조, 월 약 10만원 예상, 홈피 없어 전화 상담, 신규는 드림날개로 안내\n③ 인디펍 — 보관 서비스 종료(2024~), 발주 시 직접 발송\n④ 페이지허브 — 신국판 2000부까지 월 3만원, 배본 250부까지 월 3만원, 모아시스 연동 3.5만원",
+    meta: "출처: 진수, 영지, 재옥, 숩다, 이루비"
+  },
+  {
+    cat: "유통판매",
+    title: "독립서점 입고 방법",
+    body: "인디펍보다 개별 메일로 직접 제안이 훨씬 효과적.\n직접 연락으로 만든 관계가 오래 지속됨. 인디펍도 병행 권장.\n입고·반품비는 일반적으로 작가 부담. 반품은 착불로 오기도 함.\n서점이 문 닫을 때는 서점측이 부담하기도 함.",
+    meta: "출처: 김윤희, 영지, 고라해_써니"
+  },
+  {
+    cat: "유통판매",
+    title: "대형서점 공급가율 협상",
+    body: "교보문고 65% / 알라딘 70% / yes24 65% 기준으로 제안 후 협상.\n처음에 조금 높게 불러 조정하는 전략 유효.\nyes24에 55%로 제안 시 재확인 요청 메일 옴.\n부가세 별도 여부 확인 필요.",
+    meta: "출처: 오희정, 숩다, Sue"
+  },
+  {
+    cat: "유통판매",
+    title: "MD 미팅 준비물 및 도서 DB 등록",
+    body: "미팅 준비물: 완성된 실물 책 + 보도자료 출력 1부 (책은 2부, 1부는 서점 구매 처리)\n\nDB 등록 시 준비:\n• 서지사항, 저자소개, 저자의 말, 책소개(짧게), 출판사 서평(길게)\n• 책 속으로(발췌문 여러 개), 추천의 말\n• 표지 이미지(앞/뒤/책등 각각 jpg)\n• 미리보기 pdf(최대 30p)\n교보 협력사 메뉴 → 도서 정보 등록 안내 참고.",
+    meta: "출처: 헐내깡아지, 재옥"
+  },
+  {
+    cat: "유통판매",
+    title: "발주 자동화 — 모아시스",
+    body: "교보·알라딘·예스24 발주 SCM 처리 자동화 가능.\n페이지허브 등 일부 물류창고에서 모아시스 연동 지원.\n오전 9시 발주 처리 자유로워지는 효과.\nRPA 솔루션 활용한 자동화도 시도 가능(난이도 높음).",
+    meta: "출처: 이호영, 숩다"
+  },
+  {
+    cat: "펀딩",
+    title: "텀블벅 성공 조건 3가지",
+    body: "① 50명 이상 끌어올 수 있는 팬/인플루언서 기반\n② 광고비 집행 여유 자금\n③ 스크롤을 멈출 정도로 신선한 아이디어\n\n세 조건 중 하나 이상 필요. 최근 열기 예전보다 시들해진 상황.\n책방·마켓도 예전보다 열기 아쉬움.",
+    meta: "출처: 이용현, 헐내깡아지"
+  },
+  {
+    cat: "펀딩",
+    title: "와디즈 도서 펀딩 주의사항",
+    body: "플랫폼이 커 도서 → 펀딩 직접 연결 어려움. 광고 없이 노출 거의 불가.\n오픈예정 활용해 와디즈 자체 홍보 채널 노출 시도.\n사전정산 80%(1천만원 미만), 잔금은 펀딩 후 약 1개월.\n배송 완료 후 7일간 타 채널 판매 금지.\n기획전·오픈예정·펀딩기간 넉넉히(2개월) 잡는 것 권장.",
+    meta: "출처: 재옥"
+  },
+  {
+    cat: "펀딩",
+    title: "알라딘 북펀드",
+    body: "MD에게 직접 메일(보도자료 포함) 보내면 검토.\nMD와 함께 기획하는 방식으로 안정적.\n텀블벅보다 배송 등 후속 지원 있음. 추천.\n시음회(오프라인 이벤트) 함께 기획 가능.",
+    meta: "출처: 최정은"
+  },
+  {
+    cat: "펀딩",
+    title: "텀블벅 라스트콜 기획전",
+    body: "텀블벅 라스트콜 기획전 참여 조건 — 정확한 기준 불명확.\n목표금액 조건, 마감일과 선물 전달일 간격 등이 기준으로 추정.\n텀블벅 담당자에게 직접 문의 권장.",
+    meta: "출처: 류현지"
+  },
+  {
+    cat: "출판등록",
+    title: "ISBN 발급 및 납본",
+    body: "발급처: 국립중앙도서관 seoji.nl.go.kr\n발급 후 납본 의무 있음.\n증쇄(2쇄~)는 ISBN 변경 불필요, 서점 별도 통보 불필요.\n다이어리·공란 있으면 내용 확인 후 발급.\n사이트 장애 시 팝업 공지 확인.",
+    meta: "출처: 주현, 고라해_써니, 박규희, 강다현"
+  },
+  {
+    cat: "출판등록",
+    title: "사업자 없이 책 판매 시 세금",
+    body: "ISBN 없이 인쇄한 책은 상품(과세)으로 판매 가능.\n도서 면세 혜택은 ISBN + 출판업 등록 시 적용.\n기타소득으로 세금 신고 가능.\n기존 사업자에 소매업 추가해도 판매 가능.\n자치구 무료 세무상담 이용 권장.",
+    meta: "출처: 김현진, Monghwa"
+  },
+  {
+    cat: "출판등록",
+    title: "상표 등록",
+    body: "출판사명·로고·시리즈명은 먼저 등록하지 않으면 타인이 선점 후 사용 금지·비용 요구 가능.\n인쇄·홍보 다 해놓고 당하면 답 없음.\n시리즈명(예: '미니멈')은 따로 상표 등록 유효.\n법무 관련 전문가 상담 권장.",
+    meta: "출처: 김지은, 이호영"
+  },
+  {
+    cat: "출판등록",
+    title: "저작권 등록",
+    body: "한국저작권위원회 또는 관련 기관에서 등록 가능.\n등록 기관 확인 후 진행.",
+    meta: "출처: Monghwa"
+  },
+  {
+    cat: "출판등록",
+    title: "출판사 인감 만들기",
+    body: "공문 등 공식 서류에 필요한 경우 간단히 제작 가능.\njobkorea.co.kr/service/user/tool/stamp — 온라인 도장 제작\ndonue.co.kr/service/signature — 서명 제작 서비스",
+    meta: "출처: Sue, 헐내깡아지"
+  },
+  {
+    cat: "북페어행사",
+    title: "2026년 주요 북페어 일정",
+    body: "• 퍼블리셔스 테이블 — 9/11~13, 국립중앙도서관, 3/31까지 모집\n• 공주북페어(제1회) — 9/12~13, 4/30까지 모집\n• 서울국제도서전 책마을 — 얼리버드 2/4~2/13 (독립출판 코너)\n• 광명아트북페어 — 9/27, 광명시민체육관\n• DMZ 세계문학 페스타 — 3/28~29, 파주출판도시\n• 제주북페어 — 왕벚꽃 시즌(봄)\n• 파주 교하도서관 북페어 — 봄(일정 인스타 확인)",
+    meta: "출처: 헐내깡아지, 지현 선생님"
+  },
+  {
+    cat: "북페어행사",
+    title: "북페어 참가 실전 팁",
+    body: "• 부스천(테이블보) 필수 지참\n• 슬리퍼·생수 꼭 챙기기\n• 잔돈 충분히 준비 (5만원권 손님 많음)\n• 책 종류당 5권 내외면 충분 (소규모 페어 기준)\n• 제주북페어: 가족 단위 방문객 많음, 판매보다 분위기 중시\n• 무료배송 유도 전략 활용 가능",
+    meta: "출처: 진수, 이유라, 숩다"
+  },
+  {
+    cat: "지원사업",
+    title: "소상공인 지원 크레딧",
+    body: "신청: credit.sbiz24.kr\n사업자등록증 있고 연매출 3억 이하이면 신청 가능.\n신청 후 3일 이내 크레딧 지급. 사용 범위 넓음.",
+    meta: "출처: 최정은, 지현 선생님"
+  },
+  {
+    cat: "지원사업",
+    title: "세종도서 선정 지원",
+    body: "정부에서 도서관에 책 구매·배포하는 사업.\nISBN 있는 작가라면 신청 가능.\n1종 선정 시 약 800만원 납품.\n독립출판은 선정 확률 낮음 (보수적 기준).\n신청: kpipa.or.kr",
+    meta: "출처: 헐내깡아지"
+  },
+  {
+    cat: "지원사업",
+    title: "서울 청년 창작자 지원 (39세 이하)",
+    body: "서울 거주 39세 이하 창작자 대상. 예술인 등록 필수.\n3월~4월 접수. sfac.or.kr 공고 확인.",
+    meta: "출처: 헐내깡아지"
+  },
+  {
+    cat: "지원사업",
+    title: "다양성 만화 제작지원",
+    body: "한국만화가협회(komacon) 주관. 만화 창작자 대상.\n신청: pms.komacon.kr",
+    meta: "출처: 헐내깡아지"
+  },
+  {
+    cat: "지원사업",
+    title: "서울책보고 큐레이션 서가",
+    body: "seoulbookbogo.kr 에서 공고 확인. 독립출판물 입점 기회.\n기간 연장 시 재공고됨.",
+    meta: "출처: 숩다"
+  },
+  {
+    cat: "지원사업",
+    title: "동네서점 연계 시민교육 지원 (서울교육)",
+    body: "서울시 거주·활동 5~10인 모임 대상.\n동네서점과 연계 활동 가능한 모임 지원.\n2026년 3~10월 운영. 30개 모임 내외 선정.\n신청: 서울교육소통광장 공지사항.",
+    meta: "출처: 연희 프란치스카"
+  },
+  {
+    cat: "디자인굿즈",
+    title: "인쇄용 이미지 해상도 기본 원칙",
+    body: "인쇄용 이미지는 반드시 300dpi.\n큰 이미지 → 작게 줄이면 안 깨짐 (비율 유지 조건).\n작은 이미지 → 크게 늘리면 픽셀 문제로 깨짐.\n명함(85~90×50mm)으로 줄여도 300dpi면 OK.\n모니터에서 확대해서 보면 깨져 보이나 실물 인쇄는 티 안 남.",
+    meta: "출처: Monghwa"
+  },
+  {
+    cat: "디자인굿즈",
+    title: "책 사이즈 기준",
+    body: "신국판: 148×210mm (가장 일반적, 소설·에세이)\n국판: 148×210mm 유사 소형\n\n표지 제작 시 도련(재단선 밖 3mm) 여유 필수.\n인디자인 도련선까지 이미지 있어야 함.",
+    meta: "출처: 헐내깡아지, 루루쌤, 이루비"
+  },
+  {
+    cat: "디자인굿즈",
+    title: "에코백·북백 제작",
+    body: "을지로 쇼룸 운영 업체 추천 (홈피 없음, 전화/방문 상담).\n상담 전 준비사항: 원하는 재질 샘플, 인쇄 파일, 수량, 인쇄 컬러, 납기일, 사이즈.",
+    meta: "출처: 숩다"
+  },
+  {
+    cat: "기술AI",
+    title: "AI 영상·모션 생성 — 클링AI",
+    body: "이미지 업로드 후 텍스트로 모션 지시 → 동영상 자동 생성.\n홍보 영상·스토리보드에 활용 유용. 1트라이에 원하는 결과 안 나올 수 있음.\n미드저니는 마스터 파일 미제공, 세밀 조정 불가라 프로 작가에게는 한계.\n\n⚠ 그림 작가 2차 저작물 활용 시 원작자 동의 필수.",
+    meta: "출처: 헐내깡아지, 주현"
+  },
+  {
+    cat: "기술AI",
+    title: "Grok AI — 일러스트 영상화",
+    body: "일러스트를 간단한 영상으로 변환 가능.\n홍보물 제작에 활용. 2차 저작물이므로 원작자 동의 필수.",
+    meta: "출처: Monghwa"
+  },
+  {
+    cat: "커뮤니티",
+    title: "책방연희 정보",
+    body: "위치: 광화문·홍대 운영.\n독립출판 워크숍 운영 (고메북스 지현 작가).\n전시 공간 대여 가능 — chaegbangyeonhui@naver.com\n북토크·북마켓 정기 행사. 뉴스레터 발행 (무료 구독 가능).",
+    meta: "출처: 구선아 책방연희 대표님"
+  },
+  {
+    cat: "커뮤니티",
+    title: "책 시장 달력·독립서점 지도",
+    body: "책시장 달력: blog.bookshopmap.com/chaegsijang25-winter\n전국 독립서점 지도: bookshopmap.com/map\n제주 서점 지도: bookshopmap.com/map?location_tag=jeju_do",
+    meta: "출처: 루루쌤, 김현진"
+  }
+];
+
+const CATS = ["전체", ...Array.from(new Set(DATA.map(d => d.cat)))];
+let activeTab = "전체";
+let expandedIdx = null;
+
+function highlight(text, q) {
+  if (!q) return text;
+  const esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp(esc, 'gi'), m => `<mark>${m}</mark>`);
+}
+
+function getFiltered() {
+  const q = document.getElementById("searchInput").value.trim().toLowerCase();
+  return DATA.map((d, i) => ({...d, _i: i})).filter(d => {
+    const matchCat = activeTab === "전체" || d.cat === activeTab;
+    const matchQ = !q || d.title.toLowerCase().includes(q) || d.body.toLowerCase().includes(q);
+    return matchCat && matchQ;
+  });
+}
+
+function catCount(cat) {
+  if (cat === "전체") return DATA.length;
+  return DATA.filter(d => d.cat === cat).length;
+}
+
+function renderTabs() {
+  document.getElementById("tabs").innerHTML = CATS.map(cat =>
+    `<button class="tab ${cat === activeTab ? 'active' : ''}" onclick="setTab('${cat}')">${cat}<span class="n">${catCount(cat)}</span></button>`
+  ).join('');
+}
+
+function renderCards() {
+  const q = document.getElementById("searchInput").value.trim().toLowerCase();
+  const filtered = getFiltered();
+  document.getElementById("meta").textContent = `${filtered.length}개 항목`;
+
+  if (filtered.length === 0) {
+    document.getElementById("cards").innerHTML = `<div class="no-results"><span>🔍</span>검색 결과가 없습니다</div>`;
+    return;
+  }
+
+  document.getElementById("cards").innerHTML = filtered.map((d) => {
+    const isExp = expandedIdx === d._i;
+    return `
+    <div class="card ${isExp ? 'expanded' : ''}" onclick="toggle(${d._i})">
+      <div class="card-top">
+        <div class="card-left">
+          <span class="cat-badge badge-${d.cat}">${d.cat}</span>
+          <span class="card-title">${highlight(d.title, q)}</span>
+        </div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 6l4 4 4-4"/>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-text">${highlight(d.body.replace(/\n/g, '<br>'), q)}</div>
+        <div class="card-meta">${d.meta}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggle(idx) {
+  expandedIdx = expandedIdx === idx ? null : idx;
+  renderCards();
+}
+
+function setTab(cat) {
+  activeTab = cat;
+  expandedIdx = null;
+  renderTabs();
+  renderCards();
+}
+
+document.getElementById("searchInput").addEventListener("input", () => {
+  expandedIdx = null;
+  renderCards();
+});
+
+renderTabs();
+renderCards();
+</script>
+</body>
+</html>
